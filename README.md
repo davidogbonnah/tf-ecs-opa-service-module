@@ -1,3 +1,56 @@
+## ECS OPA Service Module
+
+Terraform module that deploys an Open Policy Agent (OPA) service on AWS ECS Fargate behind an Application Load Balancer (ALB). It provisions the ECS task definition, service, ALB, target group, listener, security groups, and CloudWatch log group needed to run OPA as a dedicated policy service.
+
+## What This Module Creates
+
+- ECS Fargate task definition and service for OPA.
+- ALB + target group + listener to expose OPA over HTTP.
+- Security groups that allow ALB -> ECS traffic on the OPA port.
+- CloudWatch log group for container logs (14-day retention).
+
+## Key Behaviors and Defaults
+
+- Fargate task uses `awsvpc` networking with `256` CPU and `512` memory.
+- ALB listens on HTTP port 80; ALB is internet-facing.
+- ECS tasks do not get public IPs; they are placed in private subnets.
+- ECS health check uses `opa_health_check_path`; ALB target group health check path is `/health`.
+- Desired count defaults to `3`.
+
+## Usage
+
+```hcl
+module "opa_service" {
+  source = "path/to/tf-ecs-opa-service-module"
+
+  region                 = var.region
+  vpc_id                 = var.vpc_id
+  cluster_id             = aws_ecs_cluster.main.id
+  public_subnet_ids       = var.public_subnet_ids
+  private_subnet_ids      = var.private_subnet_ids
+  public_network_ip_range = ["203.0.113.0/24"]
+
+  opa_service_name      = "opa"
+  opa_repository_url    = aws_ecr_repository.opa.repository_url
+  opa_tag               = "latest"
+  opa_container_port    = 8181
+  opa_health_check_path = "/health"
+
+  task_execution_role_arn = aws_iam_role.ecs_execution.arn
+  task_role_arn           = aws_iam_role.ecs_task.arn
+
+  tags = {
+    Environment = "dev"
+    Service     = "opa"
+  }
+}
+```
+
+## Notes
+
+- The target group health check path is fixed to `/health`. Ensure your OPA server serves a 200 response at this path (or adjust the module if you need a different endpoint).
+- If you need TLS termination, add an HTTPS listener and certificates outside this module (or extend it).
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
