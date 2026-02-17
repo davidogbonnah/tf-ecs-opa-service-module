@@ -31,6 +31,18 @@ variable "opa_tag" {
   default     = "1.10.1-debug"
 }
 
+variable "opa_cpu" {
+  description = "CPU units for the OPA task."
+  type        = number
+  default     = 256
+}
+
+variable "opa_memory" {
+  description = "Memory in MiB for the OPA task."
+  type        = number
+  default     = 512
+}
+
 variable "private_subnet_ids" {
   description = "Private subnet IDs for ECS task networking."
   type = list(string)

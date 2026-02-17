@@ -13,8 +13,8 @@ resource "aws_ecs_task_definition" "opa_td" {
   family                   = "${var.opa_service_name}-task"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  cpu                      = "256"
-  memory                   = "512"
+  cpu                      = var.opa_cpu
+  memory                   = var.opa_memory
   execution_role_arn       = var.task_execution_role_arn
   task_role_arn            = var.task_role_arn
 
