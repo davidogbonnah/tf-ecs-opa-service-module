@@ -16,16 +16,19 @@ variable "opa_service_name" {
 variable "opa_container_port" {
   description = "Port exposed by the OPA container."
   type = number
+  default     = 8181
 }
 
 variable "opa_health_check_path" {
   description = "HTTP path used for OPA health checks."
   type = string
+  default     = "/health"
 }
 
 variable "opa_tag" {
   description = "OPA image tag."
   type = string
+  default     = "1.10.1-debug"
 }
 
 variable "private_subnet_ids" {
@@ -33,9 +36,10 @@ variable "private_subnet_ids" {
   type = list(string)
 }
 
-variable "public_network_ip_range" {
+variable "public_access_cidrs" {
   description = "CIDR blocks allowed to access the OPA ALB."
   type = list(string)
+  default = []
 }
 
 variable "public_subnet_ids" {
