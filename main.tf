@@ -1,8 +1,18 @@
+locals {
+  tags = {
+    Environment  = var.environment
+    Project      = "${var.org_name} Cloud Management Platform"
+    Owner        = "${var.org_name} Platform Team"
+    ManagedBy    = "Terraform"
+    ContactEmail = var.org_owner_email
+  }
+}
+
 resource "aws_cloudwatch_log_group" "opa_log_group" {
   name              = "/ecs/${var.opa_service_name}"
   retention_in_days = 14
   tags = merge(
-    var.tags,
+    var.tags, local.tags,
     {
       Name = "/ecs/${var.opa_service_name}"
     }
@@ -46,6 +56,13 @@ resource "aws_ecs_task_definition" "opa_td" {
       }
     }
   ])
+
+  tags = merge(
+    var.tags, local.tags,
+    {
+      Name = "${var.opa_service_name}-td"
+    }
+  )
 }
 
 resource "aws_ecs_service" "opa_service" {
@@ -68,6 +85,14 @@ resource "aws_ecs_service" "opa_service" {
   }
 
   desired_count = var.desired_count
+
+  tags = merge(
+    var.tags, local.tags,
+    {
+      Name = "${var.opa_service_name}-service"
+    }
+  )
+
   depends_on    = [aws_lb_listener.opa_listener]
 }
 
@@ -112,7 +137,7 @@ resource "aws_security_group" "opa_alb_sg" {
   vpc_id      = var.vpc_id
 
   tags = merge(
-    var.tags,
+    var.tags, local.tags,
     {
       Name = "${var.opa_service_name}-alb-sg"
     }
@@ -145,7 +170,7 @@ resource "aws_security_group" "opa_ecs_sg" {
   vpc_id      = var.vpc_id
 
   tags = merge(
-    var.tags,
+    var.tags, local.tags,
     {
       Name = "${var.opa_service_name}-ecs-sg"
     }

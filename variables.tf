@@ -1,33 +1,48 @@
+variable "environment" {
+  description = "Deployment environment (e.g., dev, staging, prod)."
+  type        = string
+}
+
+variable "org_name" {
+  description = "Organization name for tagging."
+  type        = string
+}
+
+variable "org_owner_email" {
+  description = "Contact email for the organization owner, used in resource tagging."
+  type        = string
+}
+
 variable "cluster_id" {
   description = "ECS cluster ID where the OPA service is deployed."
-  type = string
+  type        = string
 }
 
 variable "opa_repository_url" {
   description = "ECR repository URL for the OPA image."
-  type = string
+  type        = string
 }
 
 variable "opa_service_name" {
   description = "OPA service name used for ECS and ALB resources."
-  type = string
+  type        = string
 }
 
 variable "opa_container_port" {
   description = "Port exposed by the OPA container."
-  type = number
+  type        = number
   default     = 8181
 }
 
 variable "opa_health_check_path" {
   description = "HTTP path used for OPA health checks."
-  type = string
+  type        = string
   default     = "/health"
 }
 
 variable "opa_tag" {
   description = "OPA image tag."
-  type = string
+  type        = string
   default     = "1.10.1-debug"
 }
 
@@ -45,47 +60,47 @@ variable "opa_memory" {
 
 variable "private_subnet_ids" {
   description = "Private subnet IDs for ECS task networking."
-  type = list(string)
+  type        = list(string)
 }
 
 variable "public_access_cidrs" {
   description = "CIDR blocks allowed to access the OPA ALB."
-  type = list(string)
-  default = []
+  type        = list(string)
+  default     = []
 }
 
 variable "public_subnet_ids" {
   description = "Public subnet IDs for the OPA ALB."
-  type = list(string)
+  type        = list(string)
 }
 
 variable "region" {
   description = "AWS region for logging and resource configuration."
-  type = string
+  type        = string
 }
 
 variable "tags" {
   description = "Tags applied to module resources."
-  type = map(string)
+  type        = map(string)
 }
 
 variable "task_execution_role_arn" {
   description = "IAM execution role ARN for ECS tasks."
-  type = string
+  type        = string
 }
 
 variable "task_role_arn" {
   description = "IAM task role ARN for ECS tasks."
-  type = string
+  type        = string
 }
 
 variable "vpc_id" {
   description = "VPC ID for ALB and security groups."
-  type = string
+  type        = string
 }
 
 variable "desired_count" {
   description = "Desired number of OPA tasks."
-  type    = number
-  default = 3
+  type        = number
+  default     = 3
 }
