@@ -58,6 +58,11 @@ variable "opa_memory" {
   default     = 512
 }
 
+variable "opa_bundle_api_url" {
+  description = "URL for the OPA bundle API, passed as an environment variable to the container."
+  type        = string
+}
+
 variable "private_subnet_ids" {
   description = "Private subnet IDs for ECS task networking."
   type        = list(string)

@@ -39,6 +39,10 @@ resource "aws_ecs_task_definition" "opa_td" {
         hostPort      = var.opa_container_port
         protocol      = "tcp"
       }]
+      environment = [
+        { name = "OPA_BUNDLE_API_URL", value = var.opa_bundle_api_url }
+      ]
+
       logConfiguration = {
         logDriver = "awslogs",
         options = {
