@@ -43,7 +43,7 @@ variable "opa_health_check_path" {
 variable "opa_tag" {
   description = "OPA image tag."
   type        = string
-  default     = "1.10.1-debug"
+  default     = "1.14.1-1"
 }
 
 variable "opa_cpu" {
