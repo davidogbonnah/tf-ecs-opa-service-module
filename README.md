@@ -51,6 +51,40 @@ module "opa_service" {
 - The target group health check path is fixed to `/health`. Ensure your OPA server serves a 200 response at this path (or adjust the module if you need a different endpoint).
 - If you need TLS termination, add an HTTPS listener and certificates outside this module (or extend it).
 
+## Deployment branch tag
+
+Set the optional `source_branch` input to record the deployment configuration's
+branch in the `GitBranch` AWS resource tag. When omitted (`null`), this input adds
+no branch tag. Existing tags are preserved; an explicit `source_branch` takes
+precedence over a `GitBranch` value in an existing tag map. Blank values are rejected.
+
+For local deployments, capture the branch before planning:
+
+```sh
+export TF_VAR_source_branch="$(git symbolic-ref --quiet --short HEAD)"
+terraform plan -out=deployment.tfplan
+terraform apply deployment.tfplan
+```
+
+When calling this module, declare `source_branch` in the deployment's root
+configuration and pass it through the module block:
+
+```hcl
+source_branch = var.source_branch
+```
+
+For GitHub Actions jobs that plan deployments from branches or pull requests:
+
+```yaml
+env:
+  TF_VAR_source_branch: ${{ github.head_ref || github.ref_name }}
+```
+
+For tag builds or detached HEAD checkouts, supply the intended branch explicitly.
+Saved plans retain the branch value captured during planning. Apply a new plan to
+update the tag after switching branches. Only AWS resources that support tagging
+receive this tag; Kubernetes and Helm resources do not receive AWS tags.
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
@@ -103,6 +137,7 @@ No modules.
 | <a name="input_public_access_cidrs"></a> [public\_access\_cidrs](#input\_public\_access\_cidrs) | CIDR blocks allowed to access the OPA ALB. | `list(string)` | `[]` | no |
 | <a name="input_public_subnet_ids"></a> [public\_subnet\_ids](#input\_public\_subnet\_ids) | Public subnet IDs for the OPA ALB. | `list(string)` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | AWS region for logging and resource configuration. | `string` | n/a | yes |
+| <a name="input_source_branch"></a> [source\_branch](#input\_source\_branch) | Branch of the configuration being applied. Sets the GitBranch resource tag when provided. | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags applied to module resources. | `map(string)` | `{}` | no |
 | <a name="input_task_execution_role_arn"></a> [task\_execution\_role\_arn](#input\_task\_execution\_role\_arn) | IAM execution role ARN for ECS tasks. | `string` | n/a | yes |
 | <a name="input_task_role_arn"></a> [task\_role\_arn](#input\_task\_role\_arn) | IAM task role ARN for ECS tasks. | `string` | n/a | yes |

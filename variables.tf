@@ -110,3 +110,14 @@ variable "desired_count" {
   type        = number
   default     = 3
 }
+
+variable "source_branch" {
+  description = "Branch of the configuration being applied. Sets the GitBranch resource tag when provided."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.source_branch == null ? true : length(trimspace(var.source_branch)) > 0
+    error_message = "source_branch must be null or a non-empty branch name."
+  }
+}

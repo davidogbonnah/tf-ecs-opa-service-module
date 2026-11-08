@@ -1,4 +1,6 @@
 locals {
+  source_branch_tags = var.source_branch == null ? {} : { GitBranch = var.source_branch }
+
   tags = {
     Environment  = var.environment
     Project      = "${var.org_name} Cloud Management Platform"
@@ -15,7 +17,8 @@ resource "aws_cloudwatch_log_group" "opa_log_group" {
     var.tags, local.tags,
     {
       Name = "/ecs/${var.opa_service_name}"
-    }
+    },
+    local.source_branch_tags
   )
 }
 
@@ -65,7 +68,8 @@ resource "aws_ecs_task_definition" "opa_td" {
     var.tags, local.tags,
     {
       Name = "${var.opa_service_name}-td"
-    }
+    },
+    local.source_branch_tags
   )
 }
 
@@ -94,13 +98,16 @@ resource "aws_ecs_service" "opa_service" {
     var.tags, local.tags,
     {
       Name = "${var.opa_service_name}-service"
-    }
+    },
+    local.source_branch_tags
   )
 
-  depends_on    = [aws_lb_listener.opa_listener]
+  depends_on = [aws_lb_listener.opa_listener]
 }
 
 resource "aws_lb" "opa_alb" {
+  tags = local.source_branch_tags
+
   name                       = "${var.opa_service_name}-alb"
   internal                   = false
   load_balancer_type         = "application"
@@ -110,6 +117,8 @@ resource "aws_lb" "opa_alb" {
 }
 
 resource "aws_lb_target_group" "opa_tg" {
+  tags = local.source_branch_tags
+
   name        = "${var.opa_service_name}-tg"
   port        = var.opa_container_port
   protocol    = "HTTP"
@@ -126,6 +135,8 @@ resource "aws_lb_target_group" "opa_tg" {
 }
 
 resource "aws_lb_listener" "opa_listener" {
+  tags = local.source_branch_tags
+
   load_balancer_arn = aws_lb.opa_alb.arn
   port              = 80
   protocol          = "HTTP"
@@ -144,7 +155,8 @@ resource "aws_security_group" "opa_alb_sg" {
     var.tags, local.tags,
     {
       Name = "${var.opa_service_name}-alb-sg"
-    }
+    },
+    local.source_branch_tags
   )
 }
 
@@ -177,7 +189,8 @@ resource "aws_security_group" "opa_ecs_sg" {
     var.tags, local.tags,
     {
       Name = "${var.opa_service_name}-ecs-sg"
-    }
+    },
+    local.source_branch_tags
   )
 }
 
